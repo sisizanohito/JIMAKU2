@@ -70,7 +70,7 @@ namespace Voice
                 // コマンドについてのヘルプ出力のトリガーとなるオプションを指定
                 command.HelpOption("-?|-h|--help");
 
-                var talkArgs = command.Argument("cid text", "発話者のcidとテキスト",true);
+                var talkArgs = command.Argument("話者名 text", "発話者の登録名とテキスト",true);
                 var effectOption = command.Option("-effect",
                   "例:-effect=\"speed,1.0\" -effect=\"pitch,1.3\"",
                   CommandOptionType.MultipleValue);
@@ -78,7 +78,7 @@ namespace Voice
                   "例:-emotion=\"喜び,1.0\"",
                   CommandOptionType.MultipleValue);
                 var outputOption = command.Option("-o",
-                  "出力パス 指定しない場合は発生するだけとなる",
+                  "出力パス 指定しない場合は発声だけとなる",
                   CommandOptionType.MultipleValue);
 
                 command.OnExecute(() =>
@@ -97,18 +97,18 @@ namespace Voice
 
                     text=text.Replace("<br>", "\r\n").Replace("\r\r", "\r");
 
-                    Dictionary<string, decimal> effects = new Dictionary<string, decimal>();
+                    SeikaPOSTpram pram = new SeikaPOSTpram();
+                    pram.TalkText = text;
                     foreach (var value in effectOption.Values)
                     {
                         string[] str = value.Split(',');
-                        effects.Add(str[0],decimal.Parse(str[1]));
+                        pram.Effects.Add(str[0],decimal.Parse(str[1]));
                         //Console.WriteLine("-effect= " + value);
                     }
-                    Dictionary<string, decimal> emotions = new Dictionary<string, decimal>();
                     foreach (var value in emotionOption.Values)
                     {
                         string[] str = value.Split(',');
-                        emotions.Add(str[0], decimal.Parse(str[1]));
+                        pram.Emotions.Add(str[0], decimal.Parse(str[1]));
                         //Console.WriteLine("-effect= " + value);
                     }
                     if(outputOption.Value() != null)
@@ -124,8 +124,9 @@ namespace Voice
                         writer.Close();
 
                     }
-                    
-                    SeikaConnect.Instance().scc.Talk(cid, text, savePath, effects, emotions);
+
+                    SeikaConnect.Talk(@"http://localhost:7180", cid,SeikaConnect.Serialize(pram));
+                    //SeikaConnect.Instance().scc.Talk(cid, text, savePath, effects, emotions);
                     //SeikaConnect.Instance().scc.Talk(cid, "", "",new Dictionary<string, decimal>(), new Dictionary<string, decimal>());
 
 

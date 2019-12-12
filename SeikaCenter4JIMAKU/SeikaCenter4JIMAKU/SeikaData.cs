@@ -75,8 +75,8 @@ namespace Voice
             parameter = new Dictionary<string, Pram>();
 
             //var avatorParam = SeikaConnect.Instance().scc.GetAvatorParams_current2(cid);
-            Task<SeikaACTORpram> avatorParam = SeikaConnect.Getpram(@"http://localhost:7180", cid);
-            SeikaACTORpram prams = avatorParam.Result;
+            Task<SeikaGETpram> avatorParam = SeikaConnect.Getpram(@"http://localhost:7180", cid);
+            SeikaGETpram prams = avatorParam.Result;
             foreach (KeyValuePair<string, Dictionary<string, decimal>> kvp in prams.Effects)
             {
                 decimal value = kvp.Value["value"];
@@ -109,7 +109,7 @@ namespace Voice
     }
 
     [DataContract]
-    class SeikaACTORpram
+    class SeikaGETpram
     {
 
         [DataMember(Name = "effect")]
@@ -117,5 +117,29 @@ namespace Voice
 
         [DataMember(Name = "emotion")]
         public Dictionary<string, Dictionary<string, decimal>> Emotions { get; set; }
+
+        [DataMember(Name = "talktext")]
+        public string TalkText { get; set; }
+    }
+
+    [DataContract]
+    class SeikaPOSTpram
+    {
+
+        [DataMember(Name = "effects")]
+        public Dictionary<string, decimal> Effects { get; set; }
+
+        [DataMember(Name = "emotions")]
+        public Dictionary<string, decimal> Emotions { get; set; }
+
+        [DataMember(Name = "talktext")]
+        public string TalkText { get; set; }
+
+        public SeikaPOSTpram()
+        {
+            Effects = new Dictionary<string, decimal>();
+            Emotions = new Dictionary<string, decimal>();
+            TalkText = "";
+        }
     }
 }

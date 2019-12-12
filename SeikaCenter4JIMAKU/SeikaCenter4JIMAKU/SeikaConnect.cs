@@ -32,7 +32,11 @@ namespace Voice
         {
             using (var stream = new MemoryStream())
             {
-                var serializer = new DataContractJsonSerializer(graph.GetType());
+                var setting = new DataContractJsonSerializerSettings()
+                {
+                    UseSimpleDictionaryFormat = true,
+                };
+                var serializer = new DataContractJsonSerializer(graph.GetType(), setting);
                 serializer.WriteObject(stream, graph);
                 return Encoding.UTF8.GetString(stream.ToArray());
             }
@@ -79,7 +83,7 @@ namespace Voice
         /// <summary>
         /// 話者のパラメータを返す
         /// </summary>
-        public static async Task<SeikaACTORpram> Getpram(string url,int cid)
+        public static async Task<SeikaGETpram> Getpram(string url,int cid)
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage
@@ -96,8 +100,30 @@ namespace Voice
 
             var response = await client.SendAsync(request);
             string result = await response.Content.ReadAsStringAsync();
-            SeikaACTORpram a = Deserialize<SeikaACTORpram>(result);
-            return Deserialize<SeikaACTORpram>(result);
+            SeikaGETpram a = Deserialize<SeikaGETpram>(result);
+            return Deserialize<SeikaGETpram>(result);
+        }
+
+        /// <summary>
+        /// 話す
+        /// </summary>
+        public static async void Talk(string url, int cid,string pram)
+        {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(url + $"/PLAY2/{cid}"),
+                Content = new StringContent(pram, Encoding.UTF8, "application/json")
+        };
+
+            //認証ヘッダーの追加
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+            "Basic",
+            Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "SeikaServerUser", "SeikaServerPassword"))));
+
+            var response = await client.SendAsync(request);
+            string result = await response.Content.ReadAsStringAsync();
         }
     }
 }
