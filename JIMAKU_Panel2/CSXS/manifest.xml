@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0" ExtensionBundleId="name.sisiza.JIMAKU" ExtensionBundleVersion="11.1" ExtensionBundleName="JIMAKU" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<ExtensionList>
+		<Extension Id="name.sisiza.JIMAKU" Version="10.3.0" />
+	</ExtensionList>
+	<ExecutionEnvironment>
+		<HostList>
+			<Host Name="PPRO" Version="12" />
+		</HostList>
+		<LocaleList>
+			<Locale Code="All" />
+		</LocaleList>
+		<RequiredRuntimeList>
+			<RequiredRuntime Name="CSXS" Version="6.0" />
+		</RequiredRuntimeList>
+	</ExecutionEnvironment>
+	<DispatchInfoList>
+		<Extension Id="name.sisiza.JIMAKU">
+			<DispatchInfo >
+				<Resources>
+					<MainPath>./index.html</MainPath>
+					<ScriptPath>./PProPanel.jsx</ScriptPath>
+					<CEFCommandLine>
+						<Parameter>--allow-file-access</Parameter>
+						<Parameter>--allow-file-access-from-files</Parameter>
+						<Parameter>--enable-nodejs</Parameter>
+						<Parameter>--mixed-context</Parameter>  
+					</CEFCommandLine>
+				</Resources>
+				<Lifecycle>
+					<AutoVisible>true</AutoVisible>
+				</Lifecycle>
+				<UI>
+					<Type>Panel</Type>
+					<Menu>JIMAKU</Menu>
+					<Geometry>
+						<Size>
+							<Height>500</Height>
+							<Width>700</Width>
+						</Size>
+					</Geometry>
+				</UI>
+			</DispatchInfo>
+		</Extension>
+	</DispatchInfoList>
+</ExtensionManifest>
