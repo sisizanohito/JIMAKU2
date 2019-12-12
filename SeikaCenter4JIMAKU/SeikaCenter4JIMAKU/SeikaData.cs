@@ -19,10 +19,11 @@ namespace Voice
         public SeikaData()
         {
             Data = new Dictionary<string, SeikaStruct>();
-            foreach (KeyValuePair<int, string> kvp in SeikaConnect.Instance().scc.AvatorList)
+            Task<List<SeikaACTOR>> actorList = SeikaConnect.GetActor(@"http://localhost:7180");
+            foreach(SeikaACTOR actor in actorList.Result)
             {
-                int id = kvp.Key;
-                string name = kvp.Value;
+                int id = actor.ID;
+                string name = actor.Name;
                 //Console.WriteLine($"-------------------------------------------------------");
                 //Console.WriteLine($"{id}:{name}");
                 Data.Add(name, new SeikaStruct(name, id));
@@ -86,5 +87,15 @@ namespace Voice
                 }
             }
         }
+    }
+
+    [DataContract]
+    class SeikaACTOR
+    {
+        [DataMember(Name = "cid")]
+        public int ID { get; set; }
+
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
     }
 }

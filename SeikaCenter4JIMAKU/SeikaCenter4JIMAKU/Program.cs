@@ -15,6 +15,9 @@ namespace Voice
         static void Main(string[] args)
         {
             var command = new ReadCommand(args);
+        #if DEBUG
+            Console.ReadKey();
+        #endif
         }
     }
 }
