@@ -44,15 +44,18 @@ namespace Voice
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(message)))
             {
-                //var setting = new DataContractJsonSerializerSettings()
-                //{
-                //    UseSimpleDictionaryFormat = true,
-                //};
-                var serializer = new DataContractJsonSerializer(typeof(T)/*, setting*/);
+                var setting = new DataContractJsonSerializerSettings()
+                {
+                    UseSimpleDictionaryFormat = true,
+                };
+                var serializer = new DataContractJsonSerializer(typeof(T), setting);
                 return (T)serializer.ReadObject(stream);
             }
         }
 
+        /// <summary>
+        /// 話者のリストを返す
+        /// </summary>
         public static async Task<List<SeikaACTOR>> GetActor(string url)
         {
             var client = new HttpClient();
@@ -71,6 +74,30 @@ namespace Voice
             var response = await client.SendAsync(request);
             string result = await response.Content.ReadAsStringAsync();
             return Deserialize<List<SeikaACTOR>>(result);
+        }
+
+        /// <summary>
+        /// 話者のパラメータを返す
+        /// </summary>
+        public static async Task<SeikaACTORpram> Getpram(string url,int cid)
+        {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(url + $"/AVATOR2/{cid}")
+            };
+
+            //認証ヘッダーの追加
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+            "Basic",
+            Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "SeikaServerUser", "SeikaServerPassword"))));
+
+
+            var response = await client.SendAsync(request);
+            string result = await response.Content.ReadAsStringAsync();
+            SeikaACTORpram a = Deserialize<SeikaACTORpram>(result);
+            return Deserialize<SeikaACTORpram>(result);
         }
     }
 }

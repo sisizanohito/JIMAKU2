@@ -74,18 +74,27 @@ namespace Voice
             this.cid = _cid;
             parameter = new Dictionary<string, Pram>();
 
-            var avatorParam = SeikaConnect.Instance().scc.GetAvatorParams_current2(cid);
-            foreach (KeyValuePair<string, Dictionary<string, Dictionary<string, decimal>>> prams in avatorParam)
+            //var avatorParam = SeikaConnect.Instance().scc.GetAvatorParams_current2(cid);
+            Task<SeikaACTORpram> avatorParam = SeikaConnect.Getpram(@"http://localhost:7180", cid);
+            SeikaACTORpram prams = avatorParam.Result;
+            foreach (KeyValuePair<string, Dictionary<string, decimal>> kvp in prams.Effects)
             {
-                foreach (KeyValuePair<string, Dictionary<string, decimal>> effectsEmotions in prams.Value)
-                {
-                    decimal value = effectsEmotions.Value["value"];
-                    decimal max = effectsEmotions.Value["max"];
-                    decimal min = effectsEmotions.Value["min"];
-                    decimal step = effectsEmotions.Value["step"];
-                    parameter.Add(prams.Key+"_"+effectsEmotions.Key, new Pram(value, max, min, step));
-                }
+                decimal value = kvp.Value["value"];
+                decimal max = kvp.Value["max"];
+                decimal min = kvp.Value["min"];
+                decimal step = kvp.Value["step"];
+                parameter.Add("effect"+"_"+ kvp.Key, new Pram(value, max, min, step));
             }
+
+            foreach (KeyValuePair<string, Dictionary<string, decimal>> kvp in prams.Emotions)
+            {
+                decimal value = kvp.Value["value"];
+                decimal max = kvp.Value["max"];
+                decimal min = kvp.Value["min"];
+                decimal step = kvp.Value["step"];
+                parameter.Add("emotion" + "_" + kvp.Key, new Pram(value, max, min, step));
+            }
+
         }
     }
 
@@ -97,5 +106,16 @@ namespace Voice
 
         [DataMember(Name = "name")]
         public string Name { get; set; }
+    }
+
+    [DataContract]
+    class SeikaACTORpram
+    {
+
+        [DataMember(Name = "effect")]
+        public Dictionary<string, Dictionary<string, decimal>> Effects { get; set; }
+
+        [DataMember(Name = "emotion")]
+        public Dictionary<string, Dictionary<string, decimal>> Emotions { get; set; }
     }
 }
