@@ -1,10 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -117,23 +113,27 @@ namespace Voice
                     }
                     if (savePath != "")
                     {
-                        Encoding utf = Encoding.UTF8;
+                        Task<Stream> sound = SeikaConnect.SAVE(@"http://localhost:7180", cid, SeikaConnect.Serialize(pram, true));
+                        Stream stream = sound.Result;
+                        FileStream fwriter = new FileStream(savePath,FileMode.Create);
+                        stream.CopyTo(fwriter);
+                        fwriter.Close();
+
                         StreamWriter writer =
-                          new StreamWriter(Path.GetDirectoryName(savePath) +@"/"+ Path.GetFileNameWithoutExtension(savePath) + ".txt", false, utf);
+                          new StreamWriter(Path.GetDirectoryName(savePath) +@"/"+ Path.GetFileNameWithoutExtension(savePath) + ".txt", false, Encoding.UTF8);
                         writer.WriteLine(text);
                         writer.Close();
 
+                        return 0;
                     }
-
-                    SeikaConnect.Talk(@"http://localhost:7180", cid,SeikaConnect.Serialize(pram));
-                    //SeikaConnect.Instance().scc.Talk(cid, text, savePath, effects, emotions);
-                    //SeikaConnect.Instance().scc.Talk(cid, "", "",new Dictionary<string, decimal>(), new Dictionary<string, decimal>());
-
+                    Task<string> taskString = SeikaConnect.Talk(@"http://localhost:7180", cid,SeikaConnect.Serialize(pram, true));
+                    Console.WriteLine(taskString.Result);//ただ待つため
 
                     return 0;
                 });
             });
         }
+
 
     }
 }
